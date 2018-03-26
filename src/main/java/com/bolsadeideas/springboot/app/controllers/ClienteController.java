@@ -15,8 +15,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.SessionAttributes;
 import org.springframework.web.bind.support.SessionStatus;
 
-import com.bolsadeideas.springboot.app.models.dao.IClienteDao;
 import com.bolsadeideas.springboot.app.models.entity.Cliente;
+import com.bolsadeideas.springboot.app.models.service.IClienteService;
 
 @Controller
 @SessionAttributes("cliente")
@@ -26,12 +26,12 @@ public class ClienteController {
 	private String titulo;
 	
 	@Autowired
-	private IClienteDao clienteDao;
+	private IClienteService clienteService;
 	
 	@RequestMapping(value="/listar", method=RequestMethod.GET)
 	public String listar(Model model ) {
 		model.addAttribute("titulo", titulo);
-		model.addAttribute("clientes", clienteDao.findAll());
+		model.addAttribute("clientes", clienteService.findAll());
 		return "listar";
 	}
 	
@@ -43,22 +43,6 @@ public class ClienteController {
 		return "form";
 	}
 	
-	@RequestMapping(value="/form/{id}")
-	public String editar(@PathVariable(value="id") Long id, Map<String, Object> model, SessionStatus status) {
-		Cliente cliente = null;
-		if (id>0) {
-			cliente = clienteDao.findOne(id);
-		} else {
-			return "redirect:listar";
-		}
-		model.put("cliente", cliente);
-		model.put("titulo", "Editar Cliente");
-		
-		clienteDao.save(cliente);
-		status.setComplete();
-		return "form";
-	}
-	
 //	@Valid habilita la validacion del objeto	
 	@RequestMapping(value="/form", method=RequestMethod.POST)
 	public String guardar(@Valid Cliente cliente, BindingResult result, Model model) {
@@ -66,8 +50,32 @@ public class ClienteController {
 			model.addAttribute("titulo", "Formulario");
 			return "form";
 		}
-		clienteDao.save(cliente);
-		return "redirect:listar";
+		clienteService.save(cliente);
+		return "redirect:/listar";
+	}
+	
+	@RequestMapping(value="/form/{id}")
+	public String editar(@PathVariable(value="id") Long id, Map<String, Object> model, SessionStatus status) {
+		Cliente cliente = null;
+		if (id>0) {
+			cliente = clienteService.findOne(id);
+		} else {
+			return "redirect:listar";
+		}
+		model.put("cliente", cliente);
+		model.put("titulo", "Editar Cliente");
+		
+		clienteService.save(cliente);
+		status.setComplete();
+		return "form";
+	}
+	
+	@RequestMapping(value="/eliminar/{id}")
+	public String eliminar(@PathVariable(value="id") Long id) {
+		if (id>0) {
+			clienteService.delete(id);
+		} 
+		return "redirect:/listar";
 	}
 	
 }
