@@ -6,14 +6,15 @@
 	<header th:replace="layout/layout :: header"></header>
 
 	<div class="container py-4">
-		<div class="card">
+
+		<div class="card bg-dark text-white">
 			<div class="card-header" th:text="${titulo}"></div>
 			<div class="card-body">
 
 				<div th:object="${cliente}" th:remove="tag">
 					<ul th:if="${#fields.hasErrors('*')}" class="alert alert-danger"
 						role="alert">
-						<li th:each="err :${#fields.errors('*')}" th:text="${err}"></li>
+						<li th:each="err : ${#fields.errors('*')}" th:text="${err}"></li>
 					</ul>
 				</div>
 
@@ -48,7 +49,7 @@
 					<div class="form-group row">
 						<label for="createAt" class="col-sm-2 col-form-label">Fecha</label>
 						<div class="col-sm-6">
-							<input type="text" th:field="*{createAt}" class="form-control"
+							<input type="text" class="form-control" th:field="*{createAt}"
 								th:errorclass="'form-control alert-danger'" /> <small
 								class="form-text text-danger"
 								th:if="${#fields.hasErrors('createAt')}" th:errors="*{createAt}"></small>
@@ -56,15 +57,15 @@
 					</div>
 					<div class="form-group row">
 						<div class="col-sm-6">
-							<input type="submit" value="Crear Cliente"
-								class="btn btn-primary" />
+							<input type="submit" th:value="${titulo}"
+								class="btn btn-secondary" />
 						</div>
 					</div>
-					<input type="hidden" th:field="*{id}" />
 				</form>
 			</div>
 		</div>
 	</div>
+
 	<footer th:replace="layout/layout :: footer"></footer>
 </body>
 </html>
