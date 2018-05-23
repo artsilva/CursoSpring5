@@ -5,9 +5,12 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Map;
+import java.util.UUID;
 
 import javax.validation.Valid;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -35,6 +38,8 @@ public class ClienteController {
 
 	@Autowired
 	private IClienteService clienteService;
+	
+	private final Logger log = LoggerFactory.getLogger(getClass());
 	
 	@GetMapping(value="/ver/{id}")
 	public String ver(@PathVariable(value="id") Long id, Map<String, Object> model, RedirectAttributes flash) {
@@ -104,15 +109,20 @@ public class ClienteController {
 		
 		if (!foto.isEmpty()) {
 
-			String rootPath = "C://Temp//uploads";
+			String uniqueFileName = UUID.randomUUID().toString().concat("_").concat(foto.getOriginalFilename());
+			Path rootPath = Paths.get("uploads").resolve(uniqueFileName);
+			Path rootAbsolutePath = rootPath.toAbsolutePath();
+			
+		    log.info("uniqueFileName: " + uniqueFileName);
+			log.info("rootPath: " + rootPath);
+			log.info("rootAbsolutePath: " + rootAbsolutePath.toString());
 			
 			try {
 				byte[] bytes = foto.getBytes();
-				Path rutaCompleta = Paths.get(rootPath + "//" + foto.getOriginalFilename());
-				Files.write(rutaCompleta, bytes);
-				flash.addFlashAttribute("info", "Has subido correctamente la foto '" + foto.getOriginalFilename() + "' ");
+				Files.write(rootAbsolutePath, bytes);
+				flash.addFlashAttribute("info", "Has subido correctamente la foto '" + uniqueFileName + "' ");
 				
-				cliente.setFoto(foto.getOriginalFilename());
+				cliente.setFoto(uniqueFileName);
 				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
